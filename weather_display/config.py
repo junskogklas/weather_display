@@ -1,8 +1,18 @@
-# src/weather_display/config.py
+# Coordinates for middle of Stockholm
+DEFAULT_COORDS = {
+    "lon": 18.0374,
+    "lat": 59.3432
+}
 
 # Base entry point for the SMHI meteorological observations API
 API_ENTRYPOINT = "https://opendata-download-metobs.smhi.se/api.json"
 API_BASE = "https://opendata-download-metobs.smhi.se/api"
+
+# Forecast API endpoint template (Lat & Lon decimal degrees)
+FORECAST_URL = (
+    "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/"
+    "version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
+)
 
 # Optional: define parameters you care about (e.g., temperature, wind speed, etc.)
 # These names match SMHI internal parameter IDs
