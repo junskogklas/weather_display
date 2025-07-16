@@ -1,12 +1,15 @@
 # src/weather_display/weather_api.py
 
 import requests
+
 from config import (
+    API_BASE,
     DEFAULT_PARAMETER_ID,
     DEFAULT_STATION_ID,
     DEFAULT_PERIOD,
     DATA_URL_TEMPLATE,
 )
+from datetime import datetime
 
 class WeatherAPI:
     def __init__(self, parameter_id=None, station_id=None, period=None):
@@ -14,32 +17,52 @@ class WeatherAPI:
         self.station_id = station_id or DEFAULT_STATION_ID
         self.period = period or DEFAULT_PERIOD
 
-    def _build_data_url(self):
-        return DATA_URL_TEMPLATE.format(
-            param=self.parameter_id,
-            station=self.station_id,
-            period=self.period
-        )
-
-    def fetch_observations(self):
-        """Fetch JSON weather observation data from SMHI."""
-        url = self._build_data_url()
+    def fetch_parameter_value(self, station_id, parameter_id, period="latest-hour"):
+        url = f"{API_BASE}/version/latest/parameter/{parameter_id}/station/{station_id}/period/{period}/data.json"
         response = requests.get(url)
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+
+        values = data.get("value", [])
+        if not values:
+            return None, None
+
+        latest = values[-1]
+        timestamp = latest["date"]
+        value = latest["value"]
+        return timestamp, value
+
+
+    def interpret_rain(self, mm):
+
+        try:
+            mm = float(mm)
+        except (ValueError, TypeError):
+            return "Unknown"
+        
+        if mm is None:
+            return "Unknown"
+        if mm == 0:
+            return "No rain"
+        elif mm < 1:
+            return f"Light rain ({mm} mm)"
+        elif mm < 5:
+            return f"Moderate rain ({mm} mm)"
+        else:
+            return f"Heavy rain ({mm} mm)"
+
 
     def get_latest_observation(self):
-        """Extract the latest observation value and timestamp."""
-        data = self.fetch_observations()
-        observations = data.get("value", [])
-        if not observations:
-            raise ValueError("No observations found.")
+        param_temp = 1
+        param_rain_mm = 14
+        # ignoring for now
+        # param_wind_speed = 4
+        temp_ts, temperature = self.fetch_parameter_value(self.station_id, param_temp)
+        _, rain_mm = self.fetch_parameter_value(self.station_id, param_rain_mm)
 
-        latest = observations[-1]  # Last entry is most recent
         return {
-            "timestamp": latest["date"],
-            "value": latest["value"],
-            "unit": data.get("parameter", {}).get("unit", "unknown"),
-            "station": data.get("station", {}).get("name", "Unknown Station"),
-            "parameter": data.get("parameter", {}).get("name", "Unknown Parameter")
+            "station": self.station_id,
+            "time": datetime.fromtimestamp(temp_ts / 1000).strftime("%Y-%m-%d %H:%M"),
+            "temperature": temperature,
+            "rain": self.interpret_rain(rain_mm)
         }

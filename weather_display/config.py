@@ -2,6 +2,7 @@
 
 # Base entry point for the SMHI meteorological observations API
 API_ENTRYPOINT = "https://opendata-download-metobs.smhi.se/api.json"
+API_BASE = "https://opendata-download-metobs.smhi.se/api"
 
 # Optional: define parameters you care about (e.g., temperature, wind speed, etc.)
 # These names match SMHI internal parameter IDs
