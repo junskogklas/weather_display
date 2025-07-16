@@ -39,7 +39,7 @@ class WeatherAPI:
         return {
             "timestamp": latest["date"],
             "value": latest["value"],
-            "unit": data.get("unit", "unknown"),
+            "unit": data.get("parameter", {}).get("unit", "unknown"),
             "station": data.get("station", {}).get("name", "Unknown Station"),
-            "parameter": data.get("parameter", "Unknown Parameter")
+            "parameter": data.get("parameter", {}).get("name", "Unknown Parameter")
         }
