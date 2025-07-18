@@ -24,9 +24,10 @@ def show_forecast(forecast_data):
 
 # For GUI
 class WeatherDisplay:
-    def __init__(self, observation, forecast):
+    def __init__(self, observation, forecast, fullscreen=False, refresh_freq=None):
         self.observation = observation
         self.forecast = forecast
+        self.refresh_freq = refresh_freq  # in minutes or None
         self.root = tk.Tk()
         self.root.title("Weather Display")
         self.root.geometry("480x320")
@@ -35,14 +36,34 @@ class WeatherDisplay:
         self.font_title = ("Helvetica", 18, "bold")
         self.font_section = ("Helvetica", 14, "bold")
         self.font_text = ("Helvetica", 12)
+        self.font_small = ("Helvetica", 9)
+
+        if fullscreen:
+            self.root.attributes('-fullscreen', True)
+            self.root.configure(cursor="none")  # Hide cursor
+            self.root.bind("<q>", lambda e: self.root.destroy())  # exit with q
 
         self.build_ui()
 
     def build_ui(self):
+        # Clear previous widgets if any (helpful for refresh)
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
         # Title
         title = tk.Label(self.root, text="Weather Report", font=self.font_title,
                          fg="white", bg="black")
         title.pack(pady=(10, 5))
+
+        # Top right: refresh info (if any)
+        if self.refresh_freq is not None:
+            now_str = datetime.now().strftime("%H:%M:%S")
+            freq_text = f"Refreshing every: {self.refresh_freq} min"
+            refresh_text = f"Last update: {now_str}"
+            top_frame = tk.Frame(self.root, bg="black")
+            top_frame.pack(fill="x", padx=10)
+            tk.Label(top_frame, text=freq_text, font=self.font_small, fg="grey", bg="black").pack(side="right", anchor="ne")
+            tk.Label(top_frame, text=refresh_text, font=self.font_small, fg="grey", bg="black").pack(side="right", anchor="ne", padx=(0,10))
 
         # Current weather section
         self._add_section_label("Current Weather")
