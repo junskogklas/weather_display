@@ -1,6 +1,10 @@
 # Raspberry Pi Weather Display
 
-A weather display written in Python for use with a Raspberry Pi and 7" display screen. It fetches and displays local weather observations and a short-term forecast using a minimal black-and-white interface.
+A weather display written in Python for use with a Raspberry Pi and 7" display screen. It fetches and displays local weather observations (SMHI api) and a short-term forecast using a minimal black-and-white interface. 
+
+SMHI API: https://opendata.smhi.se
+
+Simple screen I chose for this project: https://www.amazon.com/dp/B0F3JFG4RS?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1
 
 ## Setup
 
