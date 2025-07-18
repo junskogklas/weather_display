@@ -4,9 +4,11 @@ from rich.console import Console
 from datetime import datetime
 import tkinter as tk
 from datetime import datetime
+import tkinter as tk
 
 console = Console()
 
+# For terminal output
 def show_observation(data: dict):
     print(f"\nWeather at Station {data['station']}")
     print(f"Time:        {data['time']}")
@@ -20,43 +22,75 @@ def show_forecast(forecast_data):
         symbol = "🌧️" if day["total_rain"] > 0 else "☀️"
         print(f"{day['day_name']} {day['date']}: {day['max_temp']} °C max, {day['total_rain']} mm {symbol}")
 
+# For GUI
 class WeatherDisplay:
     def __init__(self, observation, forecast):
         self.observation = observation
         self.forecast = forecast
         self.root = tk.Tk()
-        self.root.title("Weather Terminal")
+        self.root.title("Weather Display")
         self.root.geometry("480x320")
         self.root.configure(bg="black")
-        self.font = ("Courier", 12)
+
+        self.font_title = ("Helvetica", 18, "bold")
+        self.font_section = ("Helvetica", 14, "bold")
+        self.font_text = ("Helvetica", 12)
+
         self.build_ui()
 
     def build_ui(self):
         # Title
-        tk.Label(self.root, text="=== WEATHER MONITOR ===", font=("Courier", 14, "bold"),
-                 fg="green", bg="black").pack(anchor="w", padx=10, pady=5)
+        title = tk.Label(self.root, text="Weather Report", font=self.font_title,
+                         fg="white", bg="black")
+        title.pack(pady=(10, 5))
 
-        # Current Weather
+        # Current weather section
+        self._add_section_label("Current Weather")
         obs = self.observation
-        now_lines = [
-            f"TIME         : {obs.get('time', 'N/A')}",
-            f"TEMPERATURE  : {obs.get('temperature', 'N/A')} °C",
-            f"RAIN STATUS  : {obs.get('rain', 'N/A')}",
-        ]
 
-        for line in now_lines:
-            tk.Label(self.root, text=line, font=self.font, fg="white", bg="black").pack(anchor="w", padx=10)
+        current = tk.Frame(self.root, bg="black")
+        current.pack(pady=2)
+        self._add_line(current, "Time", obs.get("time", "N/A"))
+        self._add_line(current, "Temperature", f"{obs.get('temperature', 'N/A')} °C")
+        self._add_line(current, "Rain", obs.get("rain", "N/A"))
 
-        # Spacer
-        tk.Label(self.root, text="", bg="black").pack()
+        # Forecast section
+        self._add_section_label("4-Day Forecast")
 
-        # Forecast Section
-        tk.Label(self.root, text="=== FORECAST (NEXT DAYS) ===",
-                 font=("Courier", 14, "bold"), fg="green", bg="black").pack(anchor="w", padx=10)
+        forecast_frame = tk.Frame(self.root, bg="black")
+        forecast_frame.pack(pady=(0, 5))
 
         for day in self.forecast:
-            line = f"{day['weekday']} {day['date']} - MAX: {day['max_temp']}°C | RAIN: {day['total_rain']} mm"
-            tk.Label(self.root, text=line, font=self.font, fg="white", bg="black").pack(anchor="w", padx=10)
+            row = tk.Frame(forecast_frame, bg="black")
+            row.pack(anchor="w", padx=20)
+
+            date_label = tk.Label(row, text=f"{day['weekday']} {day['date']}",
+                                  font=self.font_text, fg="white", bg="black", width=18, anchor="w")
+            temp_label = tk.Label(row, text=f"{day['max_temp']} °C", font=self.font_text,
+                                  fg="white", bg="black", width=10, anchor="w")
+            rain_label = tk.Label(row, text=f"{day['total_rain']} mm", font=self.font_text,
+                                  fg="white", bg="black", width=10, anchor="w")
+
+            date_label.pack(side="left")
+            temp_label.pack(side="left")
+            rain_label.pack(side="left")
+
+    def _add_section_label(self, text):
+        label = tk.Label(self.root, text=text, font=self.font_section,
+                         fg="white", bg="black", anchor="w", padx=20)
+        label.pack(anchor="w", pady=(10, 2))
+
+    def _add_line(self, parent, label_text, value_text):
+        line = tk.Frame(parent, bg="black")
+        line.pack(anchor="w", padx=20)
+
+        label = tk.Label(line, text=f"{label_text}: ", font=self.font_text,
+                         fg="white", bg="black", width=14, anchor="w")
+        value = tk.Label(line, text=value_text, font=self.font_text,
+                         fg="white", bg="black", anchor="w")
+
+        label.pack(side="left")
+        value.pack(side="left")
 
     def run(self):
         self.root.mainloop()
