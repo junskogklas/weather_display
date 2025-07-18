@@ -1,4 +1,3 @@
-
 from weather_api import WeatherAPI
 from display import WeatherDisplay
 from datetime import datetime
@@ -23,7 +22,8 @@ def main():
         return observation, forecast
 
     observation, forecast = update()
-    display = WeatherDisplay(observation, forecast, fullscreen=args.live,
+    display = WeatherDisplay(observation, forecast,
+                             fullscreen=args.live,
                              refresh_freq=args.freq if args.live else None)
 
     if args.live:
@@ -32,7 +32,8 @@ def main():
         def refresh():
             obs, fc = update()
             display.root.destroy()
-            new_display = WeatherDisplay(obs, fc, fullscreen=True,
+            new_display = WeatherDisplay(obs, fc,
+                                         fullscreen=True,
                                          refresh_freq=args.freq)
             new_display.root.after(refresh_interval_ms, refresh)
             new_display.run()
@@ -43,4 +44,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
