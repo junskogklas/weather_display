@@ -7,8 +7,8 @@ A weather display written in Python for use with a Raspberry Pi and 7" display s
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/weather-display.git
-    cd weather-display
+    git clone https://github.com/junskogklas/weather_display.git
+    cd weather_display
     ```
 
 2. (Optional) Create and activate a virtual environment:
